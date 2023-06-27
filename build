@@ -1,0 +1,63 @@
+#!/bin/bash
+
+PROGRAM=mandr
+FLAGS="-Wall -Wextra -Ofast -march=native -lcurl -lzip -s"
+
+check_root() {
+    [ "$(id -u)" != 0 ] && {
+        echo "Error: You need to be the root user to invoke this command"
+        exit 1
+    }
+}
+
+file_exists() {
+    [ ! -f "$1" ] && {
+        echo "$2"
+        exit 1
+    }
+}
+
+main() {
+    [ ! -n "$1" ] && {
+        echo Error: No arguments were provided
+        exit 1
+    }
+
+    case "$1" in
+        "--build")
+            [ ! "$(command -v cc)" ] && {
+                echo Error: No C compiler was found.
+                echo Note: If you have installed the C compiler, please make sure to create a symlink name with cc.
+                exit 1
+            }
+            cc $PROGRAM.c $FLAGS -o $PROGRAM
+            ;;
+
+        "--cleanup")
+            rm -rf mandr archive.zip tldr-main
+            ;;
+
+        "--install")
+            check_root
+            file_exists "mandr" "Error: mandr binary wasn't found. Please build it using the --build command"
+            file_exists "LICENSE" "Error: LICENSE file wasn't found. Please re-sync the folder with git repo upstream"
+            mkdir -p /opt/mandr
+            cp -f mandr README.md LICENSE /opt/mandr
+            bash -c "/opt/mandr/mandr --symlink"
+            echo "Installed"
+            ;;
+
+        "--uninstall")
+            check_root
+            rm -rf /opt/mandr /usr/bin/mandr
+            echo "Uninstalled"
+            ;;
+
+        *)
+            echo Error: Invalid arguments
+            exit 1
+            ;;
+    esac
+}
+
+main "$1"
