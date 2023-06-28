@@ -10,13 +10,6 @@ check_root() {
     }
 }
 
-file_exists() {
-    [ ! -f "$1" ] && {
-        echo "$2"
-        exit 1
-    }
-}
-
 main() {
     [ ! -n "$1" ] && {
         echo Error: No arguments were provided
@@ -34,22 +27,18 @@ main() {
             ;;
 
         "--cleanup")
-            rm -rf mandr archive.zip tldr-main
+            rm -rf mandr a.out archive.zip tldr-main
             ;;
 
         "--install")
             check_root
-            file_exists "mandr" "Error: mandr binary wasn't found. Please build it using the --build command"
-            file_exists "LICENSE" "Error: LICENSE file wasn't found. Please re-sync the folder with git repo upstream"
-            mkdir -p /opt/mandr
-            cp -f mandr README.md LICENSE /opt/mandr
-            bash -c "/opt/mandr/mandr --symlink"
+            bash -c "./mandr --symlink"
             echo "Installed"
             ;;
 
         "--uninstall")
             check_root
-            rm -rf /opt/mandr /usr/bin/mandr
+            rm -rf /usr/bin/mandr
             echo "Uninstalled"
             ;;
 

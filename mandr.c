@@ -455,7 +455,7 @@ int main(int argc, char **argv)
         /* Check for the directory */
         if (access(wpage, F_OK) == -1)
             fxerr(
-                "Error: No TL;DR directory was found."
+                "Error: No TL;DR directory was found. "
                 "Have to synced the repo?\n"
             );
 
